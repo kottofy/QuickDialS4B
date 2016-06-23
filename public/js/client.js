@@ -8,6 +8,34 @@ var userId;
 
 // Socket `notification_received` event handler.
 socket.on('notification_received', function (mailData) {
+
+  var emailbody = mailData.body.content;
+  //console.log(emailbody);
+
+  var skypecheck = emailbody.indexOf("This is an online meeting for Skype for Business, the professional meetings and communications app formerly known as Lync."); 
+  var addincheck = emailbody.indexOf("Quick dial-in link for mobile users");
+  var joinbyphonepos = emailbody.indexOf("Join by Phone</span>");
+
+if (skypecheck > 0 && addincheck < 0 && mailData.meetingMessageType != 'undefined') {   
+
+  var confidpos = emailbody.indexOf("Conference ID: ") + 15;    
+  console.log("confidpos: " + confidpos);
+  var confid = emailbody.substr(confidpos, 8).toString();    
+  
+  var telpos = emailbody.indexOf("<a href=\"tel:") + 14;   
+  //console.log("telpos: " + telpos); 
+  var telregex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/;    
+  var tel = emailbody.search(telregex).toString();    
+  var mobiletel = tel + ',,,' + confid;     
+  var newemailbody = emailbody.replace("\r\n</body>\r\n</html>\r\n", "<div><span>Quick dial-in link for mobile users: " + mobiletel + "</div></span>\r\n</body>\r\n</html>\r\n");
+  console.log('ConfID: ' + confid);
+  console.log('Tel: ' + tel);
+  console.log('New tel numer: ' + mobiletel); 
+ }
+
+else {}
+
+
   var listItem;
   var primaryText;
   var secondaryText;

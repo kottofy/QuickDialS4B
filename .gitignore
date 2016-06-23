@@ -1,3 +1,6 @@
+#tokens
+constants.js
+
 # database files
 *.sqlite3
 

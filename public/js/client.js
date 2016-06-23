@@ -9,6 +9,7 @@ var userId;
 // Socket `notification_received` event handler.
 socket.on('notification_received', function (mailData) {
 
+
   var emailbody = mailData.body.content;
   var skypecheck = emailbody.indexOf("This is an online meeting for Skype for Business, the professional meetings and communications app formerly known as Lync."); 
   var addincheck = emailbody.indexOf("Quick dial-in link for mobile users");
@@ -30,7 +31,6 @@ socket.on('notification_received', function (mailData) {
  }
 
 else {}
-
 
   var listItem;
   var primaryText;

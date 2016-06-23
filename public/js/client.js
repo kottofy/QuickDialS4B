@@ -16,11 +16,12 @@ socket.on('notification_received', function (mailData) {
 
 if (skypecheck > 0 && addincheck < 0 && typeof mailData.meetingMessageType != 'undefined') {   
 
-  var confidpos = emailbody.indexOf("Conference ID: ") + 16;    
+  var confidpos = emailbody.indexOf("Conference ID: ") + 15;    
   console.log("confidpos: " + confidpos);
-  var confid = emailbody.substr(confidpos, 8).toString();    
-  var telpos = emailbody.indexOf("<a href=\"tel:") + 14;   
-  var telregex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/;
+  var confid = emailbody.substr(confidpos, 9).toString();    
+  //var telpos = emailbody.indexOf("<a href=\"tel:") + 14;   
+  //var telregex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/;
+  var telregex = /^(\(?\+?[0-9]*\)?)?[0-9_\- \(\)]*$/;
   var tel = emailbody.match(telregex)[0].toString(); // Matches first phone number only. 
   var mobiletel = tel + ',,,' + confid;     
   var newemailbody = emailbody.replace("\r\n</body>\r\n</html>\r\n", "<div><span>Quick dial-in link for mobile users: " + mobiletel + "</div></span>\r\n</body>\r\n</html>\r\n");

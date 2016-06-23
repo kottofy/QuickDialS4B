@@ -95,16 +95,16 @@ function processNotification(subscriptionId, resource, res, next) {
 function postNewEmail (mailData, token) {
   //console.log(util.inspect(mailData, {showHidden:true, depth:null}))
 
+
   var newEmail = {
-    // "attendees": mailData.
+    "attendees": mailData.toRecipients,
     "start": mailData.startDateTime,
     "end": mailData.endDateTime,
     "subject": "Mobile Friendly Dial In - from Hack Pack",
     "body": {
             contentType: "html",
             content: '"' + "<html>Woot -> <a href='tel:" + collectNumber(mailData, token) + "%23" + "'>Click here for mobile dial-in</a></html>" + '"'
-        
-  }
+    }
   }; 
 
   requestHelper.postData( '/beta/me/events',

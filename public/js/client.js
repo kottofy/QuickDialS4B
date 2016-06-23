@@ -16,21 +16,20 @@ socket.on('notification_received', function (mailData) {
   var addincheck = emailbody.indexOf("Quick dial-in link for mobile users");
   var joinbyphonepos = emailbody.indexOf("Join by Phone</span>");
 
-if (skypecheck > 0 && addincheck < 0 && mailData.meetingMessageType != 'undefined') {   
+if (skypecheck > 0 && addincheck < 0 && typeof mailData.meetingMessageType != 'undefined') {   
 
   var confidpos = emailbody.indexOf("Conference ID: ") + 15;    
   console.log("confidpos: " + confidpos);
   var confid = emailbody.substr(confidpos, 8).toString();    
   
   var telpos = emailbody.indexOf("<a href=\"tel:") + 14;   
-  //console.log("telpos: " + telpos); 
   var telregex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/;    
-  var tel = emailbody.search(telregex).toString();    
+  var tel = emailbody.match(telregex)[0].toString();  
   var mobiletel = tel + ',,,' + confid;     
   var newemailbody = emailbody.replace("\r\n</body>\r\n</html>\r\n", "<div><span>Quick dial-in link for mobile users: " + mobiletel + "</div></span>\r\n</body>\r\n</html>\r\n");
   console.log('ConfID: ' + confid);
   console.log('Tel: ' + tel);
-  console.log('New tel numer: ' + mobiletel); 
+  console.log('New tel number: ' + mobiletel); 
  }
 
 else {}

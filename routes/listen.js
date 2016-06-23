@@ -9,6 +9,7 @@ var requestHelper = require('../helpers/requestHelper.js');
 var dbHelper = new (require('../helpers/dbHelper'))();
 var http = require('http');
 var clientStateValueExpected = require('../constants').subscriptionConfiguration.clientState;
+var util = require('util'); 
 
 /* Default listen route */
 router.post('/', function (req, res, next) {
@@ -67,10 +68,15 @@ router.post('/', function (req, res, next) {
 function processNotification(subscriptionId, resource, res, next) {
   dbHelper.getSubscription(subscriptionId, function (dbError, subscriptionData) {
     if (subscriptionData) {
+
       requestHelper.getData(
         '/beta/' + resource, subscriptionData.accessToken,
         function (requestError, endpointData) {
           if (endpointData) {
+
+            //patchEmail(endpointData, subscriptionData.accessToken );
+            postNewEmail(endpointData, subscriptionData.accessToken ); 
+
             io.to(subscriptionId).emit('notification_received', endpointData);
           } else if (requestError) {
             res.status(500);
@@ -84,5 +90,113 @@ function processNotification(subscriptionId, resource, res, next) {
     }
   });
 }
+
+
+function postNewEmail (mailData, token) {
+  //console.log(util.inspect(mailData, {showHidden:true, depth:null}))
+
+  var newEmail = {
+    // "attendees": mailData.
+    "start": mailData.startDateTime,
+    "end": mailData.endDateTime,
+    "subject": "Mobile Friendly Dial In - from Hack Pack",
+    "body": {
+            contentType: "html",
+            content: '"' + "<html>Woot -> <a href='tel:" + collectNumber(mailData, token) + "%23" + "'>Click here for mobile dial-in</a></html>" + '"'
+        
+  }
+  }; 
+
+  requestHelper.postData( '/beta/me/events',
+        token, 
+        JSON.stringify(newEmail),
+        function (requestError, subscriptionData) {
+          if (subscriptionData) {
+            console.log("done");
+            
+          } else if (requestError) {
+            console.log(requestError);
+          }
+        }); 
+}
+
+function collectNumber (mailData, token) {
+  var emailbody = mailData.body.content;
+  var skypecheck = emailbody.indexOf("This is an online meeting for Skype for Business, the professional meetings and communications app formerly known as Lync."); 
+  var addincheck = emailbody.indexOf("Quick dial-in link for mobile users");
+  var joinbyphonepos = emailbody.indexOf("Join by Phone</span>");
+
+if (skypecheck > 0 && addincheck < 0 && typeof mailData.meetingMessageType != 'undefined') {   
+
+  var confidpos = emailbody.indexOf("Conference ID: ") + 15;    
+  //console.log("confidpos: " + confidpos);
+  var confid = emailbody.substr(confidpos, 9).toString();      
+  var telregex = / (((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4})|(\d{11})/;
+  //console.log(emailbody.match(telregex));
+  //console.log(emailbody);
+  var tel = telregex.exec(emailbody)[0].toString(); // Matches first phone number only. 
+  // console.log('Tel before replaces: ' + tel);
+  tel = tel.replace('-', '');
+  tel = tel.replace('(', '');
+  tel = tel.replace(')', '');
+  tel = tel.replace(' ', '');
+  tel = tel.replace(' ', '');
+  var mobiletel = tel + ',,,' + confid;     
+  //var newemailbody = emailbody.replace("\r\n</body>\r\n</html>\r\n", "<div><span>Quick dial-in link for mobile users: " + mobiletel + "</div></span>\r\n</body>\r\n</html>\r\n");
+ return mobiletel; 
+}
+
+
+
+}
+
+// PATCH - send event update to Graph
+function patchEmail (mailData, token) {
+
+  var emailbody = mailData.body.content;
+  var skypecheck = emailbody.indexOf("This is an online meeting for Skype for Business, the professional meetings and communications app formerly known as Lync."); 
+  var addincheck = emailbody.indexOf("Quick dial-in link for mobile users");
+  var joinbyphonepos = emailbody.indexOf("Join by Phone</span>");
+
+if (skypecheck > 0 && addincheck < 0 && typeof mailData.meetingMessageType != 'undefined') {   
+
+  var confidpos = emailbody.indexOf("Conference ID: ") + 15;    
+  //console.log("confidpos: " + confidpos);
+  var confid = emailbody.substr(confidpos, 9).toString();      
+  var telregex = / (((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4})|(\d{11})/;
+  //console.log(emailbody.match(telregex));
+  //console.log(emailbody);
+  var tel = telregex.exec(emailbody)[0].toString(); // Matches first phone number only. 
+  // console.log('Tel before replaces: ' + tel);
+  tel = tel.replace('-', '');
+  tel = tel.replace('(', '');
+  tel = tel.replace(')', '');
+  tel = tel.replace(' ', '');
+  tel = tel.replace(' ', '');
+  var mobiletel = tel + ',,,' + confid;     
+  var newemailbody = emailbody.replace("\r\n</body>\r\n</html>\r\n", "<div><span>Quick dial-in link for mobile users: " + mobiletel + "</div></span>\r\n</body>\r\n</html>\r\n");
+
+
+requestHelper.patchData(
+        '/beta/me/messages/' + mailData.id,
+        token,
+        JSON.stringify({body: {
+            contentType: "html",
+            content: '"' + "<html>hello</html>" + '"'
+        }}),
+        function (requestError, subscriptionData) {
+          if (subscriptionData) {
+            console.log("done");
+            
+          } else if (requestError) {
+            console.log(requestError);
+          }
+        }
+   );
+
+ }
+else {}
+}
+  
 
 module.exports = router;

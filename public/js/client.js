@@ -10,31 +10,6 @@ var userId;
 socket.on('notification_received', function (mailData) {
 
 
-  var emailbody = mailData.body.content;
-  var skypecheck = emailbody.indexOf("This is an online meeting for Skype for Business, the professional meetings and communications app formerly known as Lync."); 
-  var addincheck = emailbody.indexOf("Quick dial-in link for mobile users");
-  var joinbyphonepos = emailbody.indexOf("Join by Phone</span>");
-
-if (skypecheck > 0 && addincheck < 0 && typeof mailData.meetingMessageType != 'undefined') {   
-
-  var confidpos = emailbody.indexOf("Conference ID: ") + 15;    
-  console.log("confidpos: " + confidpos);
-  var confid = emailbody.substr(confidpos, 9).toString();      
-  var telregex = /(((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4})|(\d{11})/;
-  telregex = telregex.replace('-', '');
-  telregex = telregex.replace('(', '');
-  telregex = telregex.replace(')', '');
-  telregex = telregex.replace(' ', '');
-  var tel = emailbody.match(telregex)[0].toString(); // Matches first phone number only. 
-  var mobiletel = tel + ',,,' + confid;     
-  var newemailbody = emailbody.replace("\r\n</body>\r\n</html>\r\n", "<div><span>Quick dial-in link for mobile users: " + mobiletel + "</div></span>\r\n</body>\r\n</html>\r\n");
-  console.log('ConfID: ' + confid);
-  console.log('Tel: ' + tel);
-  console.log('New tel number: ' + mobiletel);
- }
-
-else {}
-
   var listItem;
   var primaryText;
   var secondaryText;

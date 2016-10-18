@@ -2,7 +2,7 @@
 	exports.adalConfiguration = {
 	  authority: 'https://login.microsoftonline.com/common',
    
-	 redirectUri: 'http://quickdialconference.azurewebsites.net:3000/callback'
+	 redirectUri: 'http://localhost:3000/callback'
 	};
 	
 	exports.subscriptionConfiguration = {

@@ -11,8 +11,8 @@ describe('ADAL', function () { // eslint-disable-line no-undef
         'You don\'t have them? Get them by using the Office 365 app registration tool\n' +
         'http://dev.office.com/app-registration\n' +
         'App type: Web App\n' +
-        'Sign on URL: http://quickdialconference.azurewebsites.net:3000\n' +
-        'Redirect URI: http://quickdialconference.azurewebsites.net:3000/callback\n' +
+        'Sign on URL: http://localhost:3000\n' +
+        'Redirect URI: http://localhost:3000/callback\n' +
         'App permissions: Mail.Read'
       );
     }

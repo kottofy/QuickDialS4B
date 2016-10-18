@@ -2,7 +2,7 @@
  * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
  * See LICENSE in the project root for license information.
  */
-var socket = io.connect('http://localhost:3001'); // eslint-disable-line no-undef
+var socket = io.connect('http://quickdialconference.azurewebsites.net:3001'); // eslint-disable-line no-undef
 var subscriptionId;
 var userId;
 
